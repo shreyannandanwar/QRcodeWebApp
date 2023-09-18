@@ -1,0 +1,171 @@
+{% include "nav.html" %}
+
+
+<div class="container mt-5">
+    <div id="interface_customize">
+        <h1 class="text-center" aria-current="page">QR Code Generator</h1>
+        <br>
+        <div class="row">
+            <div class="col-md-6 centered-column">
+                <div id="customize_settings">
+                    <form action="/" method="post">
+                        <label>Text:</label>
+                        <input class="form-control" type="text" name="text">
+                        <br>
+                        <label>Size:</label>
+                        <div class="form-inline">
+                            <input class="form-control" name="settings_size_width" id="settings_size_width" type="number" value="350" max="500">
+                            <span> X </span>
+                            <input class="form-control" name="settings_size_height" id="settings_size_height" type="number" value="350" max="500">
+                        </div>
+                        <br>
+                        <label>Style:</label>
+                        <select class="form-control" name="Style" id="Style">
+                            <option value="SquareModuleDrawer">Default</option>
+                            <option value="RoundedModuleDrawer">RoundedModuleDrawer</option>
+                            <option value="GappedSquareModuleDrawer">GappedSquareModuleDrawer</option>
+                            <option value="CircleModuleDrawer">CircleModuleDrawer</option>
+                            <option value="VerticalBarsDrawer">VerticalBarsDrawer</option>
+                            <option value="HorizontalBarsDrawer">HorizontalBarsDrawer</option>
+                        </select>
+                        <br>
+
+                        <div id="qrCodeColorGroup">
+                            <label>QR code Color:</label>
+                            <input class="form-control" name="settings_foreground_color" id="settings_foreground_color" type="color" value="#000000">
+                            <br>
+                            <label>Background Color:</label>
+                            <input class="form-control" name="settings_background_color" id="settings_background_color" type="color" value="#ffffff">
+                            <br>
+                        </div>
+
+                        <div id="colorStyleGroup">
+                            <label for="ColorStyle" id="ColorStyleLabel">ColorStyle:</label>
+                            <select class="form-control" name="ColorStyle" id="ColorStyle">
+                                <option value="SolidFillColorMask">SolidFillColorMask</option>
+                                <option value="RadialGradiantColorMask">RadialGradiantColorMask</option>
+                                <option value="SquareGradiantColorMask">SquareGradiantColorMask</option>
+                                <option value="HorizontalGradiantColorMask">HorizontalGradiantColorMask</option>
+                                <option value="VerticalGradiantColorMask">VerticalGradiantColorMask</option>
+                                <option value="ImageColorMask">ImageColorMask</option>
+                            </select>
+                                <br>
+                        </div>
+
+                        <label for="file_type">File Type:</label>
+                        <select class="form-control" name="file_type" id="file_type">
+                            <option value="png">PNG</option>
+                            <option value="jpg">JPG</option>
+                            <option value="pdf">PDF</option>
+                        </select>
+                        <br>
+                        <br>
+                        <button class="btn btn-primary" type="submit">Generate</button>
+                    </form>
+<!--                    {% if btn_disabled == False %}-->
+<!--                    <button class="btn btn-primary mt-3" disabled>Download QR Code</button>-->
+<!--                    {% else %}-->
+<!--                    <a href="{{ url_for('static', filename=filename) }}" download="{{ filename }}" class="btn btn-primary mt-3"-->
+<!--                       id="downloadButton">Download QR Code</a>-->
+<!--                    {% endif %}-->
+
+                        {% if filename %}
+                            <a onclick="downloadQR('{{ filename }}')" class="btn btn-primary mt-3" id="downloadButton">Download!</a>
+    <!--                        <a href="#" onclick="downloadQR()" class="btn btn-primary mt-3" id="downloadButton">Download!</a>-->
+                        {% else %}
+                             <button class="btn btn-secondary mt-3" id="generateButton">Generate QR Code First!</button>
+                        {% endif %}
+
+                </div>
+                <br>
+            </div>
+            <div class="col-md-6 centered-column">
+<!--                <div class="center-content">-->
+<!--                    {% if filename %}-->
+<!--                        {% if filename.endswith('.pdf') %}-->
+<!--                            <object data="{{ url_for('static', filename=filename) }}" type="application/pdf" width="100%" height="600px">-->
+<!--                            <p>It appears you don't have a PDF plugin for this browser.-->
+<!--                            You can-->
+<!--                                    <a href="{{ url_for('static', filename=filename) }}">click here to download the PDF file.</a></p>-->
+<!--                            </object>-->
+<!--                        {% else %}-->
+<!--                            <img src="{{ url_for('static', filename=filename) }}" class="img-fluid" alt="Generated QR Code">-->
+<!--                        {% endif %}-->
+<!--                    <img src="{{ url_for('static', filename=filename) }}" type="application/pdf" class="img-fluid" alt="Generated QR Code">-->
+
+<!--                    {% else %}-->
+<!--                    <canvas id="myCanvas" width="500" height="500" style="border:1px solid #000;"></canvas>-->
+<!--                    {% endif %}-->
+<!--                </div>-->
+                <div class="col-md-6 centered-column">
+                     <div class="center-content">
+                        {% if filename %}
+                            {% if filename.endswith('.pdf') %}
+                                <object data="{{ url_for('static', filename=filename) }}" type="application/pdf" width="100%" height="600px">
+                                    <p>It appears you don't have a PDF plugin for this browser.
+                                    You can <a href="{{ url_for('static', filename=filename) }}">click here to download the PDF file.</a></p>
+                                </object>
+                            {% else %}
+                                <img src="{{ url_for('static', filename=filename) }}" class="img-fluid" alt="Generated QR Code">
+                            {% endif %}
+                        {% else %}
+                            <canvas id="myCanvas" width="500" height="500" style="border:1px solid #000;"></canvas>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        // Function to handle the input event of the Style select
+        function handleStyleInput() {
+            var styleSelect = document.getElementById("Style");
+            var qrCodeColorGroup = document.getElementById("qrCodeColorGroup");
+            var colorStyleGroup = document.getElementById("colorStyleGroup");
+
+            if (styleSelect.value === "SquareModuleDrawer") {
+                qrCodeColorGroup.style.display = "block";    // Show QR code color options
+                colorStyleGroup.style.display = "none";      // Hide ColorStyle options
+            } else {
+                qrCodeColorGroup.style.display = "none";     // Hide QR code color options
+                colorStyleGroup.style.display = "block";     // Show ColorStyle options
+            }
+        }
+
+        // Attach the function to the input event of the Style select
+        document.getElementById("Style").addEventListener("input", handleStyleInput);
+
+        // Initialize the visibility of elements based on the initial value
+        handleStyleInput();
+
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+       function downloadQR(fname) {
+            $.get("/check-file/"+fname, function(data) {
+
+                console.log(" " + fname)
+
+                if(!data.exists) {
+                    alert("Session Expired Try again! Session expires with in 5 mins ");
+
+                    return;
+                }
+
+                console.log("Downloading file: " + fname);
+
+                const link = document.createElement('a');
+                link.href = `/static/${fname}`;
+                link.download = fname;
+
+                // Trigger the download
+                link.click();
+
+              });
+
+            }
+</script>
+{% include "guide.html" %}
+
